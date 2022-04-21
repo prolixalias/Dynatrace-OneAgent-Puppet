@@ -160,10 +160,9 @@ class dynatraceoneagent (
   Optional[String] $windows_pwsh = undef,
 ) {
 
-  if $facts['kernel'] == 'Linux' {
-    $os_type = 'unix'
-  } elsif $facts['osfamily'] == 'AIX' {
-    $os_type = 'aix'
+  $os_type = $facts['os']['family'] ? {
+    'AIX'   => 'aix',
+    default => 'Linux',
   }
 
   if $oneagent_params_hash['INSTALL_PATH']{
@@ -206,7 +205,7 @@ class dynatraceoneagent (
       }
     }
     default: {
-      class { 'include dynatraceoneagent::download':
+      class { 'dynatraceoneagent::download':
         created_dir          => $created_dir,
         download_dir         => $download_dir,
         filename             => $filename,

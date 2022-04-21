@@ -106,83 +106,86 @@
 # @param oneagent_networkzone_config_file
 #   Configuration file location for OneAgent network zone value
 #
+
+#
 class dynatraceoneagent (
-  String $global_mode  = $dynatraceoneagent::params::global_mode,
+  Boolean $allow_insecure,
+  Boolean $manage_service,
+  Boolean $reboot_system,
+  Boolean $verify_signature,
+  Hash $oneagent_params_hash,
+  String $api_path,
+  String $arch,
+  String $ca_cert_src_path,
+  String $cert_file_name,
+  String $default_install_dir,
+  String $download_cert_link,
+  String $download_dir,
+  String $global_mode,
+  String $global_owner,
+  String $global_group,
+  String $hostautotag_config_file,
+  String $hostgroup_config_file,
+  String $hostname_config_file,
+  String $installer_type,
+  String $oneagent_ctl,
+  String $oneagent_puppet_conf_dir,
+  String $oneagent_comms_config_file,
+  String $oneagent_logmonitoring_config_file,
+  String $oneagent_logaccess_config_file,
+  String $oneagent_infraonly_config_file,
+  String $oneagent_networkzone_config_file,
+  String $package_state,
+  String $provider,
+  String $require_value,
+  String $service_name,
+  String $service_state,
+  String $version,
 
-# OneAgent Download Parameters
-  String $tenant_url                    = $dynatraceoneagent::params::tenant_url,
-  String $paas_token                    = $dynatraceoneagent::params::paas_token,
-  String $api_path                      = $dynatraceoneagent::params::api_path,
-  String $version                       = $dynatraceoneagent::params::version,
-  String $arch                          = $dynatraceoneagent::params::arch,
-  String $installer_type                = $dynatraceoneagent::params::installer_type,
-  Optional[Boolean] $verify_signature   = $dynatraceoneagent::params::verify_signature,
-  Optional[String] $proxy_server        = $dynatraceoneagent::params::proxy_server,
-  Optional[String] $download_cert_link  = $dynatraceoneagent::params::download_cert_link,
-  Optional[String] $cert_file_name      = $dynatraceoneagent::params::cert_file_name,
-  Optional[String] $ca_cert_src_path    = $dynatraceoneagent::params::ca_cert_src_path,
-  Optional[Boolean] $allow_insecure     = $dynatraceoneagent::params::allow_insecure,
-  Optional $download_options            = $dynatraceoneagent::params::download_options,
+  Boolean $infra_only = false,
+  Boolean $log_access = false,
+  Boolean $log_monitoring = false,
 
-# OneAgent Install Parameters
-  String $download_dir                   = $dynatraceoneagent::params::download_dir,
-  String $service_name                   = $dynatraceoneagent::params::service_name,
-  String $provider                       = $dynatraceoneagent::params::provider,
-  String $default_install_dir            = $dynatraceoneagent::params::default_install_dir,
-  Hash $oneagent_params_hash             = $dynatraceoneagent::params::oneagent_params_hash,
-  Boolean $reboot_system                 = $dynatraceoneagent::params::reboot_system,
-  String $service_state                  = $dynatraceoneagent::params::service_state,
-  Boolean $manage_service                = $dynatraceoneagent::params::manage_service,
-  String $package_state                  = $dynatraceoneagent::params::package_state,
+  Optional[Array] $host_metadata = [],
+  Optional[Array] $host_tags = [],
+  Optional[Hash] $oneagent_communication_hash = {},
+  Optional[String] $download_options = undef,
+  Optional[String] $host_group = undef,
+  Optional[String] $hostmetadata_config_file = undef,
+  Optional[String] $hostname = undef,
+  Optional[String] $network_zone = undef,
+  Optional[String] $tenant_url = undef,
+  Optional[String] $paas_token = undef,
+  Optional[String] $proxy_server = undef,
+  Optional[String] $windows_pwsh = undef,
+) {
 
-# OneAgent Host Configuration Parameters
-  Optional[Hash] $oneagent_communication_hash = $dynatraceoneagent::params::oneagent_communication_hash,
-  Optional[Boolean] $log_monitoring           = $dynatraceoneagent::params::log_monitoring,
-  Optional[Boolean] $log_access               = $dynatraceoneagent::params::log_access,
-  Optional[String] $host_group                = $dynatraceoneagent::params::host_group,
-  Optional[Array] $host_tags                  = $dynatraceoneagent::params::host_tags,
-  Optional[Array] $host_metadata              = $dynatraceoneagent::params::host_metadata,
-  Optional[String] $hostname                  = $dynatraceoneagent::params::hostname,
-  Optional[Boolean] $infra_only               = $dynatraceoneagent::params::infra_only,
-  Optional[String] $network_zone              = $dynatraceoneagent::params::network_zone,
-  String $oneagent_ctl                        = $dynatraceoneagent::params::oneagent_ctl,
-  String $oneagent_puppet_conf_dir            = $dynatraceoneagent::params::oneagent_puppet_conf_dir,
-  String $oneagent_comms_config_file          = $dynatraceoneagent::params::oneagent_comms_config_file,
-  String $oneagent_logmonitoring_config_file  = $dynatraceoneagent::params::oneagent_logmonitoring_config_file,
-  String $oneagent_logaccess_config_file      = $dynatraceoneagent::params::oneagent_logaccess_config_file,
-  String $hostgroup_config_file               = $dynatraceoneagent::params::hostgroup_config_file,
-  String $hostautotag_config_file             = $dynatraceoneagent::params::hostautotag_config_file,
-  String $hostmetadata_config_file            = $dynatraceoneagent::params::hostmetadata_config_file,
-  String $hostname_config_file                = $dynatraceoneagent::params::hostname_config_file,
-  String $oneagent_infraonly_config_file      = $dynatraceoneagent::params::oneagent_infraonly_config_file,
-  String $oneagent_networkzone_config_file    = $dynatraceoneagent::params::oneagent_networkzone_config_file,
+  if $facts['kernel'] == 'Linux' {
+    $os_type = 'unix'
+  } elsif $facts['osfamily'] == 'AIX' {
+    $os_type = 'aix'
+  }
 
-) inherits dynatraceoneagent::params {
+  if $oneagent_params_hash['INSTALL_PATH']{
+    $install_dir = $oneagent_params_hash['INSTALL_PATH']
+  } else {
+    $install_dir = $default_install_dir
+  }
 
-    if $::kernel == 'Linux' {
-      $os_type = 'unix'
-    } elsif $::osfamily  == 'AIX' {
-      $os_type = 'aix'
-    }
+  if $version == 'latest' {
+    $download_link  = "${tenant_url}${api_path}${os_type}/${installer_type}/latest/?Api-Token=${paas_token}&arch=${arch}"
+  } else {
+    $download_link  = "${tenant_url}${api_path}${os_type}/${installer_type}/version/${version}?Api-Token=${paas_token}&arch=${arch}"
+  }
 
-    if $oneagent_params_hash['INSTALL_PATH']{
-      $install_dir = $oneagent_params_hash['INSTALL_PATH']
-    } else {
-      $install_dir = $default_install_dir
-    }
-
-    if $version == 'latest' {
-      $download_link  = "${tenant_url}${api_path}${os_type}/${installer_type}/latest/?Api-Token=${paas_token}&arch=${arch}"
-    } else {
-      $download_link  = "${tenant_url}${api_path}${os_type}/${installer_type}/version/${version}?Api-Token=${paas_token}&arch=${arch}"
-    }
-
-    if $::osfamily == 'Windows' {
+  case $::osfamily {
+    'Windows': {
       $filename                = "Dynatrace-OneAgent-${::osfamily}-${version}.exe"
       $download_path           = "${download_dir}\\${filename}"
       $created_dir             = "${install_dir}\\agent\\agent.state"
       $oneagent_tools_dir      = "${install_dir}\\agent\\tools"
-    } elsif ($::kernel == 'Linux') or ($::osfamily  == 'AIX') {
+    }
+    default: {
       $filename                 = "Dynatrace-OneAgent-${::kernel}-${version}.sh"
       $download_path            = "${download_dir}/${filename}"
       $dt_root_cert             = "${download_dir}/${cert_file_name}"
@@ -190,23 +193,98 @@ class dynatraceoneagent (
       $oneagent_unix_params     = join($oneagent_params_array, ' ' )
       $command                  = "/bin/sh ${download_path} ${oneagent_unix_params}"
       $created_dir              = "${install_dir}/agent/agent.state"
-      $oneagent_tools_dir       = "${$install_dir}/agent/tools"
+      $oneagent_tools_dir       = "${install_dir}/agent/tools"
     }
+  }
 
-  if $package_state != 'absent' {
-    contain dynatraceoneagent::download
-    contain dynatraceoneagent::install
-    contain dynatraceoneagent::config
-    contain dynatraceoneagent::service
+  case $package_state {
+    'absent': {
+      class { 'dynatraceoneagent::uninstall':
+        provider    => $provider,
+        install_dir => $install_dir,
+        created_dir => $created_dir,
+      }
+    }
+    default: {
+      class { 'include dynatraceoneagent::download':
+        created_dir          => $created_dir,
+        download_dir         => $download_dir,
+        filename             => $filename,
+        download_path        => $download_path,
+        proxy_server         => $proxy_server,
+        allow_insecure       => $allow_insecure,
+        download_options     => $download_options,
+        download_link        => $download_link,
+        download_cert_link   => $download_cert_link,
+        cert_file_name       => $cert_file_name,
+        ca_cert_src_path     => $ca_cert_src_path,
+        provider             => $provider,
+        oneagent_params_hash => $oneagent_params_hash,
+        reboot_system        => $reboot_system,
+        service_name         => $service_name,
+        package_state        => $package_state,
+        global_owner         => $global_owner,
+        global_group         => $global_group,
+        global_mode          => $global_mode,
+      }
+      class {'dynatraceoneagent::install':
+        reboot_system            => $reboot_system,
+        created_dir              => $created_dir,
+        download_dir             => $download_dir,
+        filename                 => $filename,
+        download_path            => $download_path,
+        provider                 => $provider,
+        oneagent_params_hash     => $oneagent_params_hash,
+        service_name             => $service_name,
+        package_state            => $package_state,
+        oneagent_puppet_conf_dir => $oneagent_puppet_conf_dir,
+      }
+      class { 'dynatraceoneagent::config':
+        infra_only                         => $infra_only,
+        log_monitoring                     => $log_monitoring,
+        log_access                         => $log_access,
+        global_owner                       => $global_owner,
+        global_group                       => $global_group,
+        global_mode                        => $global_mode,
+        service_name                       => $service_name,
+        provider                           => $provider,
+        install_dir                        => $install_dir,
+        created_dir                        => $created_dir,
+        package_state                      => $package_state,
+        service_state                      => $service_state,
+        oneagent_tools_dir                 => $oneagent_tools_dir,
+        oactl                              => $oneagent_ctl,
+        oneagent_communication_hash        => $oneagent_communication_hash,
+        host_group                         => $host_group,
+        host_tags                          => $host_tags,
+        host_metadata                      => $host_metadata,
+        hostname                           => $hostname,
+        network_zone                       => $network_zone,
+        oneagent_puppet_conf_dir           => $oneagent_puppet_conf_dir,
+        oneagent_comms_config_file         => $oneagent_comms_config_file,
+        oneagent_logmonitoring_config_file => $oneagent_logmonitoring_config_file,
+        oneagent_logaccess_config_file     => $oneagent_logaccess_config_file,
+        hostgroup_config_file              => $hostgroup_config_file,
+        hostautotag_config_file            => $hostautotag_config_file,
+        hostmetadata_config_file           => $hostmetadata_config_file,
+        hostname_config_file               => $hostname_config_file,
+        oneagent_infraonly_config_file     => $oneagent_infraonly_config_file,
+        oneagent_networkzone_config_file   => $oneagent_networkzone_config_file,
+        windows_pwsh                       => $windows_pwsh,
+      }
+      class { 'dynatraceoneagent::service':
+        manage_service => $manage_service,
+        service_name   => $service_name,
+        require_value  => $require_value,
+        service_state  => $service_state,
+        package_state  => $package_state,
+      }
 
-    Class['::dynatraceoneagent::download']
-    -> Class['::dynatraceoneagent::install']
-    -> Class['::dynatraceoneagent::config']
-    -> Class['::dynatraceoneagent::service']
-  } else {
-    contain dynatraceoneagent::uninstall
-
-    Class['::dynatraceoneagent::uninstall']
+      Class['::dynatraceoneagent::download']
+      -> Class['::dynatraceoneagent::install']
+      -> Class['::dynatraceoneagent::config']
+      -> Class['::dynatraceoneagent::service']
+    }
   }
 
 }

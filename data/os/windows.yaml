@@ -1,0 +1,21 @@
+---
+dynatraceoneagent::os_type: 'windows'
+dynatraceoneagent::download_dir: 'C:\\Windows\\Temp'
+dynatraceoneagent::global_owner: 'Administrator'
+dynatraceoneagent::global_group: 'Administrators'
+dynatraceoneagent::service_name: 'Dynatrace OneAgent'
+dynatraceoneagent::provider: 'windows'
+dynatraceoneagent::default_install_dir: "%{facts.dynatrace_oneagent_programfiles}\\dynatrace\\oneagent"
+dynatraceoneagent::oneagent_ctl: 'oneagentctl.exe'
+dynatraceoneagent::windows_pwsh: "%{::system32}\\WindowsPowerShell\\v1.0"
+dynatraceoneagent::require_value: Package[%{lookup('dynatraceoneagent::service_name')}]
+dynatraceoneagent::oneagent_puppet_conf_dir: "%{facts.dynatrace_oneagent_appdata}\\dynatrace\\oneagent\\agent\\config\\puppet"
+dynatraceoneagent::oneagent_comms_config_file: "%{lookup('dynatraceoneagent::oneagent_puppet_conf_dir')}\\deployment.conf"
+dynatraceoneagent::oneagent_logmonitoring_config_file: "%{lookup('dynatraceoneagent::oneagent_puppet_conf_dir')}\\logmonitoring.conf"
+dynatraceoneagent::oneagent_logaccess_config_file: "%{lookup('dynatraceoneagent::oneagent_puppet_conf_dir')}\\logaccess.conf"
+dynatraceoneagent::hostgroup_config_file: "%{lookup('dynatraceoneagent::oneagent_puppet_conf_dir')}\\hostgroup.conf"
+dynatraceoneagent::hostautotag_config_file: "%{lookup('dynatraceoneagent::oneagent_puppet_conf_dir')}\\puppethostautotag.conf"
+dynatraceoneagent::hostname_config_file: "%{lookup('dynatraceoneagent::oneagent_puppet_conf_dir')}\\hostname.conf"
+dynatraceoneagent::hostmetadata_config_file: "%{lookup('dynatraceoneagent::oneagent_puppet_conf_dir')}\\hostcustomproperties.conf"
+dynatraceoneagent::oneagent_infraonly_config_file: "%{lookup('dynatraceoneagent::oneagent_puppet_conf_dir')}\\infraonly.conf"
+dynatraceoneagent::oneagent_networkzone_config_file: "%{lookup('dynatraceoneagent::oneagent_puppet_conf_dir')}\\networkzone.conf"

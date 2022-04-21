@@ -1,33 +1,35 @@
 # @summary
 #   This class downloads the OneAgent installer binary
 #
-class dynatraceoneagent::download {
+
+#
+class dynatraceoneagent::download (
+  String $created_dir,
+  String $download_dir,
+  String $filename,
+  String $download_path,
+  String $proxy_server,
+  Boolean $allow_insecure,
+  String $download_options,
+  String $download_link,
+  String $download_cert_link,
+  String $cert_file_name,
+  String $ca_cert_src_path,
+  String $provider,
+  Hash $oneagent_params_hash,
+  Boolean $reboot_system,
+  String $service_name,
+  String $package_state,
+  String $global_owner,
+  String $global_group,
+  String $global_mode,
+) {
 
   if !defined('archive') {
     class { 'archive':
       seven_zip_provider => '',
     }
   }
-
-  $created_dir              = $dynatraceoneagent::created_dir
-  $download_dir             = $dynatraceoneagent::download_dir
-  $filename                 = $dynatraceoneagent::filename
-  $download_path            = $dynatraceoneagent::download_path
-  $proxy_server             = $dynatraceoneagent::proxy_server
-  $allow_insecure           = $dynatraceoneagent::allow_insecure
-  $download_options         = $dynatraceoneagent::download_options
-  $download_link            = $dynatraceoneagent::download_link
-  $download_cert_link       = $dynatraceoneagent::download_cert_link
-  $cert_file_name           = $dynatraceoneagent::cert_file_name
-  $ca_cert_src_path         = $dynatraceoneagent::ca_cert_src_path
-  $provider                 = $dynatraceoneagent::provider
-  $oneagent_params_hash     = $dynatraceoneagent::oneagent_params_hash
-  $reboot_system            = $dynatraceoneagent::reboot_system
-  $service_name             = $dynatraceoneagent::service_name
-  $package_state            = $dynatraceoneagent::package_state
-  $global_owner             = $dynatraceoneagent::global_owner
-  $global_group             = $dynatraceoneagent::global_group
-  $global_mode              = $dynatraceoneagent::global_mode
 
   if $package_state != 'absent' {
     file{ $download_dir:
@@ -53,7 +55,7 @@ class dynatraceoneagent::download {
     file { $dynatraceoneagent::dt_root_cert:
       ensure  => present,
       mode    => $global_mode,
-      source  => "puppet:///${ca_cert_src_path}",
+      source  => "puppet:///modules/${ca_cert_src_path}",
       require => File[$download_dir]
     }
 

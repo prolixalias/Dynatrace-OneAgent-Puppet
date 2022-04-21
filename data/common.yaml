@@ -1,2 +1,36 @@
 ---
-{}
+dynatraceoneagent::global_mode: '0644'
+dynatraceoneagent::api_path: '/api/v1/deployment/installer/agent/'
+dynatraceoneagent::version: 'latest'
+dynatraceoneagent::arch: 'all'
+dynatraceoneagent::installer_type: 'default'
+dynatraceoneagent::allow_insecure: false
+dynatraceoneagent::verify_signature: false
+dynatraceoneagent::download_cert_link: 'https://ca.dynatrace.com/dt-root.cert.pem'
+dynatraceoneagent::cert_file_name: 'dt-root.cert.pem'
+dynatraceoneagent::ca_cert_src_path: "modules/%{::module_name}/%{lookup('dynatraceoneagent::cert_file_name')}"
+dynatraceoneagent::oneagent_params_hash:
+  '--set-infra-only': false
+  '--set-app-log-content-access': true
+dynatraceoneagent::reboot_system: false
+dynatraceoneagent::service_state: 'running'
+dynatraceoneagent::manage_service: true
+dynatraceoneagent::package_state: 'present'
+dynatraceoneagent::download_dir: '/tmp'
+dynatraceoneagent::global_owner: 'root'
+dynatraceoneagent::global_group: 'root'
+dynatraceoneagent::service_name: 'oneagent'
+dynatraceoneagent::provider: 'shell'
+dynatraceoneagent::default_install_dir: '/opt/dynatrace/oneagent'
+dynatraceoneagent::oneagent_ctl: 'oneagentctl'
+dynatraceoneagent::require_value: Exec['install_oneagent']
+dynatraceoneagent::oneagent_puppet_conf_dir: '/var/lib/dynatrace/oneagent/agent/config/puppet'
+dynatraceoneagent::oneagent_comms_config_file: "%{lookup('dynatraceoneagent::oneagent_puppet_conf_dir')}/deployment.conf"
+dynatraceoneagent::oneagent_logmonitoring_config_file: "%{lookup('dynatraceoneagent::oneagent_puppet_conf_dir')}/logmonitoring.conf"
+dynatraceoneagent::oneagent_logaccess_config_file: "%{lookup('dynatraceoneagent::oneagent_puppet_conf_dir')}/logaccess.conf"
+dynatraceoneagent::hostgroup_config_file: "%{lookup('dynatraceoneagent::oneagent_puppet_conf_dir')}/hostgroup.conf"
+dynatraceoneagent::hostautotag_config_file: "%{lookup('dynatraceoneagent::oneagent_puppet_conf_dir')}/hostautotag.conf"
+dynatraceoneagent::hostmetadata_config_file: "%{lookup('dynatraceoneagent::oneagent_puppet_conf_dir')}/hostcustomproperties.conf"
+dynatraceoneagent::hostname_config_file: "%{lookup('dynatraceoneagent::oneagent_puppet_conf_dir')}/hostname.conf"
+dynatraceoneagent::oneagent_infraonly_config_file: "%{lookup('dynatraceoneagent::oneagent_puppet_conf_dir')}/infraonly.conf"
+dynatraceoneagent::oneagent_networkzone_config_file: "%{lookup('dynatraceoneagent::oneagent_puppet_conf_dir')}/networkzone.conf"

@@ -1,11 +1,13 @@
 # @summary
 #   Uninstalls the Dynatrace OneAgent
 #
-class dynatraceoneagent::uninstall {
 
-  $provider                            = $dynatraceoneagent::provider
-  $install_dir                         = $dynatraceoneagent::install_dir
-  $created_dir                         = $dynatraceoneagent::created_dir
+#
+class dynatraceoneagent::uninstall (
+  String $provider,
+  String $install_dir,
+  String $created_dir,
+) {
 
   $created_dir_exists = find_file($created_dir)
 

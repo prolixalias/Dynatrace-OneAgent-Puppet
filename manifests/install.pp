@@ -1,19 +1,20 @@
 # @summary
 #   This class manages the installation of the OneAgent on the host
 #
-class dynatraceoneagent::install {
 
-  $created_dir              = $dynatraceoneagent::created_dir
-  $download_dir             = $dynatraceoneagent::download_dir
-  $filename                 = $dynatraceoneagent::filename
-  $download_path            = $dynatraceoneagent::download_path
-  $provider                 = $dynatraceoneagent::provider
-  $oneagent_params_hash     = $dynatraceoneagent::oneagent_params_hash
-  $reboot_system            = $dynatraceoneagent::reboot_system
-  $service_name             = $dynatraceoneagent::service_name
-  $package_state            = $dynatraceoneagent::package_state
-  $oneagent_puppet_conf_dir = $dynatraceoneagent::oneagent_puppet_conf_dir
-
+#
+class dynatraceoneagent::install (
+  Boolean $reboot_system,
+  String $created_dir,
+  String $download_dir,
+  String $filename,
+  String $download_path,
+  String $provider,
+  String $oneagent_params_hash,
+  String $service_name,
+  String $package_state,
+  String $oneagent_puppet_conf_dir,
+) {
   if ($::kernel == 'Linux' or $::osfamily  == 'AIX'){
     exec { 'install_oneagent':
         command   => $dynatraceoneagent::command,
